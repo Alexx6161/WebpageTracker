@@ -68,12 +68,21 @@ export async function fetchStats() {
   return response.json();
 }
 
-export async function triggerCheckAll() {
-  const response = await fetch(`${API_BASE}/check-all`, {
+export async function triggerCheckAll(state = null) {
+  const url = state ? `${API_BASE}/check-all?state=${encodeURIComponent(state)}` : `${API_BASE}/check-all`;
+  const response = await fetch(url, {
     method: "POST"
   });
   if (!response.ok) {
     throw new Error("Failed to trigger check");
+  }
+  return response.json();
+}
+
+export async function fetchStates() {
+  const response = await fetch(`${API_BASE}/targets/states`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch states");
   }
   return response.json();
 }

@@ -170,12 +170,12 @@ def get_dashboard_stats(session: Session) -> dict:
     total_tracked = session.exec(select(func.count(Target.id))).one()
     
     changed_last_24h = session.exec(
-        select(func.count(Target.id)).where(Target.updated_at >= twenty_four_hours_ago)
+        select(func.count(Target.id)).where(Target.last_changed_at >= twenty_four_hours_ago)
     ).one()
     
     reviewed_last_24h = session.exec(
         select(func.count(Target.id)).where(
-            Target.updated_at >= twenty_four_hours_ago,
+            Target.last_reviewed_at >= twenty_four_hours_ago,
             Target.reviewed == True
         )
     ).one()

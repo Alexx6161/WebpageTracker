@@ -85,6 +85,6 @@ def delete_targets_endpoint(
     return {"message": f"Successfully deleted {deleted_count} targets", "count": deleted_count}
 
 @app.post("/api/check-all")
-def trigger_check_all():
-    count = check_all_targets()
+def trigger_check_all(state: Optional[str] = Query(None)):
+    count = check_all_targets(state)
     return {"message": f"Successfully checked {count} targets", "count": count}
