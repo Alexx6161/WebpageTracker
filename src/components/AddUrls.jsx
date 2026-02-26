@@ -9,6 +9,9 @@ export default function AddUrls() {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadResult, setUploadResult] = useState(null);
     const [error, setError] = useState(null);
+    const [manualRows, setManualRows] = useState([
+        { state: '', listing_id: '', pid: '', suite_id: '', assigned_to: '', url: '' }
+    ]);
 
     const handleDragOver = (e) => {
         e.preventDefault();
@@ -17,6 +20,23 @@ export default function AddUrls() {
 
     const handleDragLeave = () => {
         setIsDragging(false);
+    };
+
+    const handleManualChange = (index, field, value) => {
+        setManualRows(prev =>
+            prev.map((row, i) => (i === index ? { ...row, [field]: value } : row))
+        );
+    };
+
+    const addManualRow = () => {
+        setManualRows(prev => [
+            ...prev,
+            { state: '', listing_id: '', pid: '', suite_id: '', assigned_to: '', url: '' }
+        ]);
+    };
+
+    const removeManualRow = (index) => {
+        setManualRows(prev => (prev.length === 1 ? prev : prev.filter((_, i) => i !== index)));
     };
 
     const processData = async (data) => {
@@ -119,6 +139,14 @@ export default function AddUrls() {
         if (files && files.length > 0) {
             handleFile(files[0]);
         }
+    };
+
+    const handleManualSubmit = async (e) => {
+        e.preventDefault();
+        const nonEmptyRows = manualRows.filter(row =>
+            Object.values(row).some(val => String(val || '').trim() !== '')
+        );
+        await processData(nonEmptyRows);
     };
 
     return (
@@ -271,6 +299,126 @@ export default function AddUrls() {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Manual Entry Grid */}
+                <div className="mt-12 w-full flex flex-col items-center text-left">
+                    <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-3 self-start">
+                        Or enter URLs manually
+                    </h3>
+                    <p className="text-[var(--text-secondary)] text-sm mb-4 self-start max-w-3xl">
+                        Use the same columns as the template above. These rows will be submitted using the same import process as file uploads.
+                    </p>
+
+                    <form onSubmit={handleManualSubmit} className="w-full">
+                        <div className="rounded-lg border border-[var(--border-color)] overflow-hidden shadow-xl bg-[var(--bg-color)]" style={{ minWidth: '800px' }}>
+                            {/* Header Row (A, B, C...) */}
+                            <div style={{ display: 'flex', backgroundColor: '#2d2d2d', borderBottom: '1px solid #404040', fontFamily: 'monospace', fontSize: '0.75rem', fontWeight: 600, color: '#9ca3af' }}>
+                                <div style={{ width: '40px', borderRight: '1px solid #404040', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', backgroundColor: '#1e1e1e', flexShrink: 0 }}></div>
+                                <div style={{ width: '60px', borderRight: '1px solid #404040', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', flexShrink: 0 }}>A</div>
+                                <div style={{ width: '120px', borderRight: '1px solid #404040', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', flexShrink: 0 }}>B</div>
+                                <div style={{ width: '100px', borderRight: '1px solid #404040', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', flexShrink: 0 }}>C</div>
+                                <div style={{ width: '100px', borderRight: '1px solid #404040', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', flexShrink: 0 }}>D</div>
+                                <div style={{ width: '130px', borderRight: '1px solid #404040', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', flexShrink: 0 }}>E</div>
+                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem' }}>F</div>
+                            </div>
+
+                            {/* Field Names Row */}
+                            <div style={{ display: 'flex', backgroundColor: '#1e1e1e', borderBottom: '1px solid #404040', fontFamily: 'monospace', fontSize: '0.875rem', color: 'var(--accent-color)', fontWeight: 'bold' }}>
+                                <div style={{ width: '40px', borderRight: '1px solid #404040', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', color: '#6b7280', fontWeight: 'normal', flexShrink: 0 }}>#</div>
+                                <div style={{ width: '60px', borderRight: '1px solid #404040', padding: '0.5rem', backgroundColor: '#2a2a2a', flexShrink: 0 }}>state</div>
+                                <div style={{ width: '120px', borderRight: '1px solid #404040', padding: '0.5rem', backgroundColor: '#2a2a2a', flexShrink: 0 }}>listing_id</div>
+                                <div style={{ width: '100px', borderRight: '1px solid #404040', padding: '0.5rem', backgroundColor: '#2a2a2a', flexShrink: 0 }}>pid</div>
+                                <div style={{ width: '100px', borderRight: '1px solid #404040', padding: '0.5rem', backgroundColor: '#2a2a2a', flexShrink: 0 }}>suite_id</div>
+                                <div style={{ width: '130px', borderRight: '1px solid #404040', padding: '0.5rem', backgroundColor: '#2a2a2a', flexShrink: 0 }}>assigned_to</div>
+                                <div style={{ flex: 1, padding: '0.5rem', backgroundColor: '#2a2a2a' }}>url</div>
+                            </div>
+
+                            {/* Editable Rows */}
+                            {manualRows.map((row, index) => (
+                                <div key={index} style={{ display: 'flex', borderBottom: '1px solid #303030', color: '#d1d5db', alignItems: 'stretch' }}>
+                                    <div style={{ width: '40px', borderRight: '1px solid #404040', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', color: '#6b7280', fontSize: '0.75rem', backgroundColor: '#1e1e1e', flexShrink: 0 }}>
+                                        {index + 1}
+                                    </div>
+                                    <div style={{ width: '60px', borderRight: '1px solid #303030', padding: '0.25rem 0.5rem', flexShrink: 0 }}>
+                                        <input
+                                            type="text"
+                                            value={row.state}
+                                            onChange={(e) => handleManualChange(index, 'state', e.target.value)}
+                                            className="w-full bg-transparent outline-none text-xs text-gray-100"
+                                        />
+                                    </div>
+                                    <div style={{ width: '120px', borderRight: '1px solid #303030', padding: '0.25rem 0.5rem', flexShrink: 0 }}>
+                                        <input
+                                            type="text"
+                                            value={row.listing_id}
+                                            onChange={(e) => handleManualChange(index, 'listing_id', e.target.value)}
+                                            className="w-full bg-transparent outline-none text-xs text-gray-100"
+                                        />
+                                    </div>
+                                    <div style={{ width: '100px', borderRight: '1px solid #303030', padding: '0.25rem 0.5rem', flexShrink: 0 }}>
+                                        <input
+                                            type="text"
+                                            value={row.pid}
+                                            onChange={(e) => handleManualChange(index, 'pid', e.target.value)}
+                                            className="w-full bg-transparent outline-none text-xs text-gray-100"
+                                        />
+                                    </div>
+                                    <div style={{ width: '100px', borderRight: '1px solid #303030', padding: '0.25rem 0.5rem', flexShrink: 0 }}>
+                                        <input
+                                            type="text"
+                                            value={row.suite_id}
+                                            onChange={(e) => handleManualChange(index, 'suite_id', e.target.value)}
+                                            className="w-full bg-transparent outline-none text-xs text-gray-100"
+                                        />
+                                    </div>
+                                    <div style={{ width: '130px', borderRight: '1px solid #303030', padding: '0.25rem 0.5rem', flexShrink: 0 }}>
+                                        <input
+                                            type="text"
+                                            value={row.assigned_to}
+                                            onChange={(e) => handleManualChange(index, 'assigned_to', e.target.value)}
+                                            className="w-full bg-transparent outline-none text-xs text-gray-100"
+                                        />
+                                    </div>
+                                    <div style={{ flex: 1, padding: '0.25rem 0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <input
+                                            type="text"
+                                            value={row.url}
+                                            onChange={(e) => handleManualChange(index, 'url', e.target.value)}
+                                            className="w-full bg-transparent outline-none text-xs text-blue-300"
+                                        />
+                                        {manualRows.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => removeManualRow(index)}
+                                                className="text-xs text-[var(--error-color)] hover:underline whitespace-nowrap"
+                                            >
+                                                Remove
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-4 mt-4">
+                            <button
+                                type="button"
+                                onClick={addManualRow}
+                                className="btn btn-secondary"
+                                disabled={isUploading}
+                            >
+                                + Add another row
+                            </button>
+                            <button
+                                type="submit"
+                                className="btn btn-primary"
+                                disabled={isUploading}
+                            >
+                                {isUploading ? 'Submitting…' : 'Submit manual URLs'}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
