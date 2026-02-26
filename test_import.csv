@@ -1,0 +1,6 @@
+state,listing_id,pid,suite_id,assigned_to,url
+TX,L999001,PID999001,S-TEST-01,Alex Smith,https://example.com/property/test/1
+NY,L999002,PID999002,S-TEST-02,Jane Doe,https://example.com/property/test/2
+FL,L999003,PID999003,S-TEST-03,Bob Ross,https://example.com/property/test/3
+CA,L999004,PID999004,S-TEST-04,John Wick,https://example.com/property/test/4
+WA,L999005,PID999005,S-TEST-05,Sarah Connor,https://example.com/property/test/5
